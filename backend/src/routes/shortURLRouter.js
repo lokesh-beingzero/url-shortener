@@ -6,6 +6,6 @@ const shortURLRouter = Router();
 
 shortURLRouter.post('/', privateRoute, createShortURL);
 
-shortURLRouter.get('/:shortCode', privateRoute, getAndRedirectURL);
+shortURLRouter.get('/:shortCode', getAndRedirectURL);
 
 export default shortURLRouter;
