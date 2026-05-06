@@ -50,20 +50,26 @@ export const createShortURL = async (req, res) => {
 }
 
 export const getAndRedirectURL = async (req, res) => {
-    const { shortCode } = req.params
+    try {
+        const { shortCode } = req.params
 
-    const shortURL = await ShortURL.findOne({ shortCode: shortCode, isActive: true });
+        const shortURL = await ShortURL.findOne({ shortCode: shortCode, isActive: true });
 
-    if(!shortURL) {
-        return res.status(404).json({ message: "Short url not found or is inactive"});
+        if(!shortURL) {
+            return res.status(404).json({ message: "Short url not found or is inactive"});
+        }
+        
+        if(shortURL.expiresAt < new Date()) {
+            console.log("The Short url is expired");
+            shortURL.isActive = false;
+            await shortURL.save();
+            return res.status(410).json({ message: "The Short url is expired"});
+        }
+
+        return res.redirect(shortURL.originalUrl);
     }
-    
-    if(shortURL.expiresAt < new Date()) {
-        console.log("The Short url is expired");
-        shortURL.isActive = false;
-        await shortURL.save();
-        return res.status(410).json({ message: "The Short url is expired"});
+    catch(error) {
+        console.error('Error while getting shortUrl from DB', error);
+        return res.status(500).json({ message: "Internal Server Error" });
     }
-
-    return res.redirect(shortURL.originalUrl);
 }
