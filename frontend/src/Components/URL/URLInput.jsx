@@ -5,11 +5,16 @@ import { isValidUrl } from "../../utils/utils";
 import { showNotification } from "@mantine/notifications";
 import { SHORTEN_URL } from "../../utils/urls";
 
-export default function URLInput() {
-    const [originalURL, setOriginalURL] = useState('');
-    const [title, setTitle] = useState('');
-    const [expiryDate, setExpiryDate] = useState(null);
-    const [shortURL, setShortURL] = useState('');
+export default function URLInput(props) {
+    const {
+        originalURL,
+        setOriginalURL,
+        title,
+        setTitle,
+        expiryDate,
+        setExpiryDate,
+        setShortCode
+    } = props;
 
     const service = new Service();
 
@@ -23,8 +28,8 @@ export default function URLInput() {
             return;
         }
         const response = await service.post(SHORTEN_URL, { originalURL, expiresAt: expiryDate, title });
-        console.log('response after generating short url = ', response);
         
+        setShortCode(response.shortCode);
     }
     return (
         <Container size="xs">
